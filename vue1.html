@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        *{margin:0;padding:0;}
+        li{list-style:none;}
+        #demo1{width:960px;margin:0 auto;}
+        #ul{background: #ffffcc;}
+        .errors li{color:red;}
+        .li{transition:all .5s ease-in;}
+        .li.change-enter,.li.change-leave{height:0;opacity:0;}
+    </style>
+    <!--  inject:js -->
+    <script src="bower_components/vue/dist/vue.min.js"></script>
+    <!--  endinject -->
+</head>
+<body>
+<div id="demo1">
+    <ul id="ul">
+        <li class="li" v-repeat="users" v-transition="change">
+            <span >{{name}} - {{email}}</span>
+            <button v-on="click:removeuser(this)">X</button>
+        </li>
+    </ul>
+    <form v-on="submit:adduser">
+        <input type="text" v-model="newUser.name | nameValidator | capitalize" />
+        <input v-model="newUser.email | emailValidator" />
+        <input type="submit" value="Add User">
+    </form>
+    <ul class="errors">
+        <li v-show="!validation.name">name can't be empty</li>
+        <li v-show="!validation.email">email is not valid!</li>
+    </ul>
+</div>
+<script>
+    var url = 'https://vue-demo.firebaseIO.com/';
+    var emailRe = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    var users = new Firebase(url + 'users');
+    users.on('child_added', function (snap) {
+        var item = snap.val();
+        item.id = snap.name();
+        v1.users.push(item);
+    });
+    users.on('child_removed', function (snap) {
+        var id = snap.name();
+        v1.users.some(function (u) {
+            if(u.id == id){
+                v1.users.$remove(u);
+                return true;
+            }
+        });
+
+    });
+
+    var v1 = new Vue({
+        el:'#demo1',
+        data:{
+            users:[],
+            newUser:{
+                name:'',
+                email:''
+            },
+            validation:{
+                name:false,
+                email:false
+            }
+        },
+        methods:{
+            removeuser: function (u) {
+                new Firebase(url + 'users/' + u).remove();
+            },
+            adduser: function (e) {
+                e.preventDefault();
+                if(this.isvalid()){
+                    users.push(this.newUser);
+                    this.newUser = {
+                        name:'',
+                        email:''
+                    };
+                }
+            }
+        },
+        filters:{
+            nameValidator: function (v) {
+                this.validation.name = !!v;
+                return v;
+            },
+            emailValidator: function (v) {
+                this.validation.email = emailRe.test(v);
+                return v;
+            }
+        },
+        computed: {
+            isvalid:function () {
+                var valid = true;
+                for(var attr in this.validation){
+                    if(!this.validation[attr]){
+                        valid = false;
+                    }
+                }
+                return valid;
+            }
+        }
+    });
+</script>
+</body>
+</html>

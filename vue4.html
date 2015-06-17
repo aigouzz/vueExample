@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        *{nargin:0;padding:0;}
+        polygon{fill:#47f325;opacity:.75;}
+        circle{fill:transparent;stroke:#999;}
+        text{font-size: 10px;fill:#666;}
+        label{display:inline-block;margin-left:10px;width:20px;}
+        #raw{position: absolute;left:400px;top:0;}
+    </style>
+    <!-- inject:js -->
+    <script src="bower_components/vue/dist/vue.min.js"></script>
+    <!-- endinject -->
+</head>
+<body>
+<script id="my-grid" type="text/x-template">
+<g>
+    <polygon v-attr="points:points"></polygon>
+    <circle r="80" cx="100" cy="100"></circle>
+    <axis-label v-repeat="stats"></axis-label>
+</g>
+</script>
+<script id="axis-polygon" type="text/x-template">
+<text v-attr="x:point.x,y:point.y">{{label}}</text>
+</script>
+<div id="demo">
+    <svg width="200" height="200">
+        <polygraph stats="stats"></polygraph>
+    </svg>
+    <div v-repeat="stats">
+        <label>{{label}}</label>
+        <input type="range" v-model="value" min="0 max=100">
+        <span>{{value}}</span>
+        <button v-on="click:remove(this)">X</button>
+    </div>
+    <form id="add">
+        <input type="text" v-model="newlabel" name="newlabel" />
+        <input type="button" value="add a stat" v-on="click:add"/>
+    </form>
+    <pre id="raw">{{stats | json}}</pre>
+</div>
+<p>[input type="range"] need ie10 or above</p>
+<script>
+    var stats = [
+        {label:'A',value:'100'},
+        {label:'B',value:'100'},
+        {label:'C',value:'100'},
+        {label:'D',value:'100'},
+        {label:'E',value:'100'},
+    ];
+    Vue.component('polygraph',{
+        props:['stats'],
+        template:'#my-grid',
+        replace:true,
+        computed: {
+            points: function () {
+                var total = this.stats.length;
+                return this.stats.map(function (stat,i) {
+                    var point = valueToPoint(stat.value,i,total);
+                    return point.x + ','+ point.y;
+                }).join(' ');
+            }
+        },
+        components:{
+            'axis-polygon':{
+                template:'#axis-poligon',
+                replace:true,
+                computed:{
+                    point: function () {
+                        return valueToPoint( ＋this.value ＋ 10,this.$index,this.$parent.stats.length );
+                    }
+                }
+            }
+        }
+    });
+    var v1 = new Vue({
+        el:'#demo',
+        data:{
+            newlabel:'',
+            stats:stats
+        },
+        methods:{
+            add: function (e) {
+                e.preventDefault();
+                if(!this.newlabel)return;
+                this.stats.push({
+                    label:this.newlabel,
+                    value:100
+                });
+                this.newlabel = '';
+            },
+            remove:function(id){
+                if(this.stats.length > 3){
+                    this.stats.$remove(id.$data);
+                }else{
+                    alert('can\'t remove more!');
+                }
+
+            }
+        }
+    });
+    function valueToPoint(value,index,total){
+        var x= 0;
+        var y = -value*0.8;
+        var angle = Math.PI*2/total*index;
+        var sin = Math.sin(angle);
+        var cos = Math.cos(angle);
+        var tx = x*cos - y*sin + 100;
+        var ty = x*sin + y*cos + 100;
+        return {
+            x:tx,
+            y:ty
+        };
+    }
+</script>
+</body>
+</html>

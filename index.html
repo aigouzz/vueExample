@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <!-- inject:css -->
+    <!-- endinject -->
+
+    <!-- inject:js -->
+    <script src="bower_components/vue/dist/vue.min.js"></script>
+    <!-- endinject -->
+</head>
+<body>
+<div id="demo">
+   <h1>Latest vue update</h1>
+
+    <template v-repeat="b:branches">
+        <input type="radio" id="{{b}}" value="{{b}}" v-model="currentbranch">
+        <label for="{{b}}">{{b}}</label>
+    </template>
+    <p>{{currentbranch}}</p>
+    <ul>
+        <li v-repeat="commits">
+            <a href="{{html_url}}" target="_blank">{{sha.slice(0,7)}}</a>
+            <span>{{commit.message | truncat}}</span>-
+            <span>{{commit.author.name}}</span>-
+            <span>{{commit.author.date | dateTrans}}</span>
+        </li>
+    </ul>
+</div>
+<script>
+    var apiUrl = 'https://api.github.com/repos/yyx990803/vue/commits?per_page=3&sha=';
+    var v1 = new Vue({
+        el:'#demo',
+        data:{
+            branches:['master','dev','next'],
+            currentbranch:'master',
+            commits:null
+        },
+        filters:{
+            truncat: function (v) {
+                return v;
+            },
+            dateTrans: function (v) {
+                return v.replace(/T|Z/g,' ');
+            }
+        },
+        created: function () {
+            this.fetchData();
+            this.$watch('currentbranch', function () {
+                this.fetchData();
+            });
+        },
+        methods:{
+            fetchData: function () {
+                var xhr = new XMLHttpRequest();
+                var self =  this;
+                xhr.open('GET',apiUrl + self.currentbranch);
+                xhr.onload = function () {
+                    self.commits = JSON.parse(xhr.responseText);
+                };
+                xhr.send();
+            }
+        }
+    });
+
+</script>
+</body>
+</html>

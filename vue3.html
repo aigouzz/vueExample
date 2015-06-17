@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        *{margin:0;padding:0;}
+        .item{cursor: pointer;}
+        .bold{font-weight: bold;}
+        ul{padding-left:1em;line-height:1.5em;}
+    </style>
+
+    <!-- inject:css -->
+    <!-- endinject -->
+
+    <!-- inject:js -->
+    <script src="bower_components/vue/dist/vue.min.js"></script>
+    <!-- endinject -->
+</head>
+<body>
+
+<script id="my-item" type="text/x-template">
+    <li>
+        <div v-class="bold:isFolder" v-on="click:toggle,dblclick:changeType">
+            {{model.name}}
+            <span v-if="isFolder">[{{open ?'-':'+'}}]</span>
+        </div>
+        <ul v-show="open" v-if="isFolder">
+            <item class="item" v-repeat="model : model.children"></item>
+            <li v-on="click:addChild">+</li>
+        </ul>
+    </li>
+</script>
+<p>This is an example to show how can we use vue!</p>
+<ul id="demo3">
+    <item class="item" model="{{treeData}}"></item>
+</ul>
+<script>
+    var data = {
+        name:'my tree',
+        children:[
+            {name:'idea'},
+            {name:'wat'},
+            {
+                name:'child folder',
+                children:[
+                    {
+                        name:'child folder',
+                        children:[
+                            {name:'hello'},
+                            {name:'wat'}
+                        ]
+                    },
+                    {name:'china'},
+                    {name:'japan'},
+                    {
+                        name:'america',
+                        children:[
+                            {name:'last'},
+                            {name:'yellow'}
+                        ]
+                    }
+                ]
+            }
+        ]
+    };
+    Vue.component('item',{
+        props:['model'],
+        template:'#my-item',
+        replace:true,
+        data: function () {
+            return{
+                open:false
+            };
+        },
+        computed: {
+            isFolder: function () {
+                return this.model.children && this.model.children.length;
+            }
+        },
+        methods:{
+            toggle: function () {
+                if(this.isFolder){
+                    this.open = ! this.open;
+                }
+            },
+            changeType: function () {
+                if(!this.isFolder){
+                    this.model.$add('children',[]);
+                    this.addChild();
+                    this.open = true;
+                }
+            },
+            addChild: function () {
+                this.model.children.push(
+                        {name:'new stuff'}
+                );
+            }
+        }
+    });
+    var v3 = new Vue({
+        el:'#demo3',
+        data:{
+            treeData:data
+        }
+    });
+</script>
+</body>
+</html>

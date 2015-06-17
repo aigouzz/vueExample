@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        *{margin:0;padding:0;box-sizing: border-box;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-o-box-sizing:border-box;}
+        body{font-size: 12px;color:#393939;}
+        #slider{max-width:950px;margin:0 auto;text-align: center;}
+        #overflow{width:100%;overflow: hidden;}
+        #slides .inner{width:400%;}
+        #slides .inner{-webkit-transition: all .8s ease;-o-transition: all .8s ease;-moz-transition: all .8s ease;-ms-transition:all .8s ease;transition: all .8s ease;}
+        #slides article{width:25%;float:left;}
+        #slide1:checked ~ #slides .inner{margin-left:0;}
+        #slide2:checked ~ #slides .inner{margin-left:-100%;}
+        #slide3:checked ~ #slides .inner{margin-left:-200%;}
+        #slide4:checked ~ #slides .inner{margin-left:-300%;}
+        input[type="radio"]{display:none;}
+        label{display: inline-block;background: #ccc;width:10px;height:10px;border-radius: 5px;}
+        #slide1:checked ~ label[for="slide1"],#slide2:checked ~ label[for="slide2"],#slide3:checked ~ label[for="slide3"],#slide4:checked ~ label[for="slide4"]{
+            background: #42b983;
+        }
+    </style>
+    <!-- inject:js -->
+    <script src="bower_components/vue/dist/vue.min.js"></script>
+    <!-- endinject -->
+</head>
+<body>
+<script type="text/x-template" id="my-template">
+<div id="slider">
+    <input checked="" type="radio" name="slider" id="slide1" selected="false" />
+    <input type="radio" name="slider" id="slide2" selected="false" />
+    <input type="radio" name="slider" id="slide3" selected="false" />
+    <input type="radio" name="slider" id="slide4" selected="false" />
+    <div id="slides">
+        <div id="overflow">
+            <div class="inner">
+                <article>
+                    <content select="img:nth-of-type(1)"></content>
+                </article>
+                <article>
+                    <content select="img:nth-of-type(2)"></content>
+                </article>
+                <article>
+                    <content select="img:nth-of-type(3)"></content>
+                </article>
+                <article>
+                    <content select="img:nth-of-type(4)"></content>
+                </article>
+            </div>
+        </div>
+    </div>
+    <label for="slide1"></label>
+    <label for="slide2"></label>
+    <label for="slide3"></label>
+    <label for="slide4"></label>
+</div>
+</script>
+<div id="demo">
+    <img-slider>
+        <img src="images/1.jpg" />
+        <img src="images/2.jpg" />
+        <img src="images/3.jpg" />
+        <img src="images/4.jpg" />
+    </img-slider>
+</div>
+<script>
+    Vue.component('img-slider',{
+        template:'#my-template'
+
+    });
+    var v1 = new Vue({
+        el:'#demo'
+    });
+</script>
+</body>
+</html>
