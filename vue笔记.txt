@@ -1,0 +1,29 @@
+1：directive：指令  v-text=“message” message变化会导致text content更新
+2：filter：v-text=“{time | uppercase}”
+3:v-repeat:user:users     {{user.name}}
+4:array:$remove(number)   $set(number,{key:value});
+5:v-on=“click:onclick”
+6:click:submit(‘hi!’,$event);
+7:keydown:submit | key 13(key enter)
+8:v-model=“msg” sync    //同步改变
+9：computed properties:new Vue({
+ computed:{
+	fullName:{
+		get:function(){}，
+		set:function(){}
+}		
+}
+});
+10：custom directive：v-directive=“dir”
+Vue.directive(‘dir’,{
+	bind:function(){},
+	update:function(){},
+	unbind:function(){}
+});
+11:filter:Vue.filter(‘reverse’,function(v){
+return v.split(‘’).reverse().join(‘’);
+});
+12:
+
+
+
